@@ -2,6 +2,8 @@ import 'dart:developer';
 import 'package:cityquest/Authentificationpages/MDPoublie.dart';
 import 'package:cityquest/Authentificationpages/inscription.dart';
 import 'package:cityquest/Pages/MapScreen.dart';
+import 'package:cityquest/Services/auth2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -9,12 +11,35 @@ import 'package:firebase_core/firebase_core.dart';
 class LoginPage extends StatelessWidget {
   String mail = "";
   String pass = "";
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
   LoginPage({Key? key}) : super(key: key);
 
+  TextEditingController _passwordcontroller = TextEditingController();
+  TextEditingController _emailcontroller = TextEditingController();
+
+  void initState(){
+    initFirebase();
+  }
+
+  void initFirebase()async{
+    await Firebase.initializeApp();
+    FirebaseAuth.instance
+    .authStateChanges()
+    .listen((User? user) {
+      if(user==null){
+        print("user not connected !");
+      }
+      else{
+        print("User connected");
+      }
+
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-   
       appBar: AppBar(
         title: const Text("Ma page de Login"),
         centerTitle: true,
@@ -63,43 +88,49 @@ class LoginPage extends StatelessWidget {
   Widget _buildform(BuildContext context) {
     return Column(
       children: <Widget>[
-        Form(
-          child: TextFormField(
-            //Récup Email entré par l'utilisateur
-            onChanged: (newText) {
-              mail = newText;
-            },
-            decoration: const InputDecoration(
-              labelText: "Votre Email",
-            ),
-          ),
-        ),
-        TextFormField(
-          onChanged: (newText) {
-            pass = newText;
-          },
-          decoration: const InputDecoration(labelText: "Votre mot de passe"),
-          obscureText: true,
-        ),
-        ElevatedButton(
-          child: const Text("Login"),
-          onPressed: () {
-            // ignore: todo
-            //TODO : Fonction de connexion
-            if (mail == "123" /* && pass == "123"*/) {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => const MapScreen()));
-            } else {
-              log("Erreur identifiants....");
-            }
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
-              const Color.fromARGB(255, 128, 13, 5),
-            ),
-          ),
-        ),
-        TextButton(
+        const SizedBox(
+                  height: 20,
+                ),
+                reusableTextField("Entrez votre adresse mail", Icons.person_outline, false,
+                    _emailcontroller),
+                const SizedBox(
+                  height: 20,
+                ),
+                reusableTextField("Entrer votre mot de passe", Icons.lock_outlined, true,
+                    _passwordcontroller),
+                const SizedBox(
+                  height: 20,
+                ),
+                firebaseUIButton(context, true, () {
+                  FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: _emailcontroller.text,
+                          password: _passwordcontroller.text)
+                      .then((value) {
+                    print("Created New Account");
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const MapScreen()));
+                  }).onError((error, stackTrace) {
+                    showDialog(
+                      context: context, 
+                      barrierDismissible: false,
+                      builder: (BuildContext context){
+                        return AlertDialog(
+                          title: const Text("Erreur !"),
+                          actions: <Widget>[
+                            const Text("Si cela ne fonctionne pas essayer de vous créer un compte !"),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text("Fermer le pop-up"),)
+
+                          ],
+                        );
+                      },
+                      );
+
+                  });
+                }),
+                TextButton(
           child: const Text("Mot de passe oublié"),
           onPressed: () {
             log("Mot de passe oublié");
@@ -117,4 +148,5 @@ class LoginPage extends StatelessWidget {
       ],
     );
   }
+
 }

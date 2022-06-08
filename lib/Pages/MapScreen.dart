@@ -19,6 +19,20 @@ class MapScreen extends StatefulWidget {
     late GoogleMapController _googleMapController;
     late  MapType _currentMapType = MapType.normal;
 
+    static final Marker _kLakeMarker = Marker(
+      markerId: MarkerId('_kGooglePlex'),
+      infoWindow: InfoWindow(title: 'Google Plex'),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      position: LatLng(50.657087, 3.129205),
+
+      );
+
+      static final Marker _idpositionmarker = Marker(
+      markerId: const MarkerId('_yourposition'),
+      infoWindow: const InfoWindow(title: 'Votre position !'),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      position: LatLng(50.62998647192007, 3.056167049079924),
+      );
 
     @override
     void dispose(){
@@ -49,6 +63,12 @@ class MapScreen extends StatefulWidget {
           zoomControlsEnabled: false,
           initialCameraPosition: _positioncamera,
           onMapCreated: (controller) => _googleMapController = controller,
+          markers: {
+            _kLakeMarker,
+            _idpositionmarker,
+          },
+        
+
           ),
           floatingActionButton: FloatingActionButton(
             backgroundColor: Colors.white,
@@ -65,7 +85,18 @@ class MapScreen extends StatefulWidget {
           //   child: const Icon(Icons.app_settings_alt_sharp),
           //   ),
     );
+
+ 
   }
+
+
+
+
+
+
+
+  
+  
 
 
 

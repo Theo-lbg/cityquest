@@ -84,9 +84,8 @@ Widget build(BuildContext context) => Scaffold(
             // ignore: todo
             //TODO : Fonction de connexion
             if (pass1 == "123" && pass2 == "123") {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => LoginPage()));
-            } else {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/route1', (Route<dynamic> route) => false);
               log("Mince....");
             }
           },

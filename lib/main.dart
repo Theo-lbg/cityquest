@@ -1,4 +1,5 @@
 import 'package:cityquest/Authentificationpages/LoginPage.dart';
+import 'package:cityquest/Authentificationpages/inscription.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "My City Quest",
       theme: ThemeData(primarySwatch: Colors.red),
-       home: LoginPage()
-    );
+       home: LoginPage(),
+         );
   }
+  
+ 
 
   
 }

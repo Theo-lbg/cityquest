@@ -1,12 +1,17 @@
 import 'dart:developer';
 import 'package:cityquest/Authentificationpages/LoginPage.dart';
+import 'package:cityquest/Services/auth2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:cityquest/Services/auth2.dart';
 
 
 class inscription extends StatelessWidget {
-  String mail = "";
-  String pass = "";
-  String pass2= "";
+  
+
+  final TextEditingController _passwordcontroller = TextEditingController();
+  final TextEditingController _emailcontroller = TextEditingController();
 
   inscription({Key? key}) : super(key: key);
 
@@ -61,54 +66,50 @@ class inscription extends StatelessWidget {
   Widget _buildform(BuildContext context) {
     return Column(
       children: <Widget>[
-        Form(
-          child: TextFormField(
-            //Récup Email entré par l'utilisateur
-            onChanged: (newText) {
-              mail = newText;
-            },
-            decoration: const InputDecoration(
-              labelText: "Votre Email",
-            ),
-          ),
-        ),
-        TextFormField(
-          onChanged: (newText) {
-            pass = newText;
-          },
-          decoration: const InputDecoration(labelText: "Votre mot de passe"),
-          obscureText: true,
-        ),
-        TextFormField(
-          onChanged: (newText) {
-            pass = newText;
-          },
-          decoration: const InputDecoration(labelText: "Votre mot de passe encore une fois"),
-          obscureText: true,
-        ),
         const SizedBox(
-            height: 25,
-          ),
-        ElevatedButton(
-          onPressed: () {
-            // ignore: todo
-            //TODO : Fonction de connexion
-            if (mail == "123" /* && pass == "123"*/) {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => LoginPage()));
-            } else {
-              log("Erreur identifiants....");
-            }
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
-              const Color.fromARGB(255, 128, 13, 5),
-            ),
-          ),
-          child: const Text("Valider"),
-        ),
-        
-      ],
+                  height: 20,
+                ),
+                reusableTextField("Entrez votre adresse mail", Icons.person_outline, false,
+                    _emailcontroller),
+                const SizedBox(
+                  height: 20,
+                ),
+                reusableTextField("Entrer votre mot de passe", Icons.lock_outlined, true,
+                    _passwordcontroller),
+                const SizedBox(
+                  height: 20,
+                ),
+                firebaseUIButton(context, false, () {
+                  FirebaseAuth.instance
+                      .createUserWithEmailAndPassword(
+                          email: _emailcontroller.text,
+                          password: _passwordcontroller.text)
+                      .then((value) {
+                    print("Created New Account");
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  }).onError((error, stackTrace) {
+                    showDialog(
+                      context: context, 
+                      barrierDismissible: false,
+                      builder: (BuildContext context){
+                        return AlertDialog(
+                          title: const Text("Erreur !"),
+                          actions: <Widget>[
+                            const Text("Cet adresse mail ou mot de passe est déjà utilisé ! Veuillez réssayer",
+                            textAlign: TextAlign.center,),
+                            TextButton(
+                              onPressed: () => Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/route1', (Route<dynamic> route) => false),
+                              child: const Text("Fermer le pop-up"),)
+
+                          ],
+                        );
+                      },
+                      );
+                  });
+                })
+              ],
     );
   }
 }
