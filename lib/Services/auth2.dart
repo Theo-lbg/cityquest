@@ -59,7 +59,7 @@ Container firebaseUIButton(BuildContext context, bool isLogin, Function onTap) {
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
       child: Text(
-        isLogin ? 'Se connecter ' : "S'enregistrer",
+        isLogin ? 'Se connecter ' : "Enregistrer",
         style: const TextStyle(
             color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
       ),

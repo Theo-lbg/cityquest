@@ -20,6 +20,9 @@ class MyApp extends StatelessWidget {
       title: "My City Quest",
       theme: ThemeData(primarySwatch: Colors.red),
        home: LoginPage(),
+       routes: <String, WidgetBuilder> {
+        '/route1': (BuildContext context) => LoginPage(),
+      },
          );
   }
   

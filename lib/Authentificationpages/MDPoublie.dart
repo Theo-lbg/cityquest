@@ -1,11 +1,12 @@
 import 'dart:developer';
 import 'package:cityquest/Authentificationpages/LoginPage.dart';
+import 'package:cityquest/Services/auth2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class MDPoublie extends StatelessWidget{
-String pass1 = "";
-  String pass2 = "";
+  final TextEditingController _passwordcontroller = TextEditingController();
+  final TextEditingController _emailcontroller = TextEditingController();
 
 Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
@@ -60,41 +61,44 @@ Widget build(BuildContext context) => Scaffold(
   Widget _buildform(BuildContext context) {
     return Column(
       children: <Widget>[
-        Form(
-          child: TextFormField(
-            //Récup Email entré par l'utilisateur
-            onChanged: (newText) {
-              pass1 = newText;
-            },
-            decoration: const InputDecoration(
-              labelText: "Nouveau Mot de passe",
-            ),
-          ),
-        ),
-        TextFormField(
-          onChanged: (newText) {
-            pass2 = newText;
-          },
-          decoration: const InputDecoration(labelText: "Nouveau Mot de passe X2"),
-          obscureText: true,
-        ),
-        ElevatedButton(
-          child: const Text("Valider"),
-          onPressed: () {
-            // ignore: todo
-            //TODO : Fonction de connexion
-            if (pass1 == "123" && pass2 == "123") {
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil('/route1', (Route<dynamic> route) => false);
-              log("Mince....");
-            }
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
-              const Color.fromARGB(255, 128, 13, 5),
-            ),
-          ),
-        ),
+        const SizedBox(
+                  height: 20,
+                ),
+                reusableTextField("Entrez votre adresse mail", Icons.person_outline, false,
+                    _emailcontroller),
+                const SizedBox(
+                  height: 20,
+                ),
+                firebaseUIButton(context, false, () {
+                  FirebaseAuth.instance
+                      .sendPasswordResetEmail(
+                          email: _emailcontroller.text,
+                      )
+                      .then((value) {
+
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  }).onError((error, stackTrace) {
+                    showDialog(
+                      context: context, 
+                      barrierDismissible: false,
+                      builder: (BuildContext context){
+                        return AlertDialog(
+                          title: const Text("Erreur !"),
+                          actions: <Widget>[
+                            const Text("Cet adresse mail n'existe pas !",
+                            textAlign: TextAlign.center,),
+                            TextButton(
+                              onPressed: () => Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/route1', (Route<dynamic> route) => false),
+                              child: const Text("Fermer le pop-up"),)
+
+                          ],
+                        );
+                      },
+                      );
+                  });
+                })
       ],
     );
   }
